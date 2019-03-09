@@ -1,9 +1,9 @@
-// web/src/app.js
+// src/app.js
 
-import React, { Component } from "react"
-import { Route, Switch, Redirect } from 'react-router-dom'
-import { connect } from "react-redux"
-import Web3 from "web3"
+import React, { Component } from 'react';
+import { Route, Switch, Redirect } from 'react-router-dom';
+import { connect } from 'react-redux';
+import Web3 from 'web3';
 
 const MainView = () => <div>Main View</div>
 const NewGameView = () => <div>New Game View</div>
@@ -14,12 +14,11 @@ const MessageView = props => <div>{props.message || ""}</div>
 
 class App extends Component {
     componentDidMount() {
+        // Check for web3 provider
         if (window.web3 && window.web3.currentProvider) {
             window.web3 = new Web3(window.web3.currentProvider)
-
             web3.eth.net.getNetworkType().then(id => {
                 this.props.dispatch({ type: "SET_NETWORK_ID", networkId: id })
-
                 return web3.eth.getAccounts()
             }).then(accounts => {
                 this.props.dispatch({ type: "SET", accounts })
@@ -32,11 +31,19 @@ class App extends Component {
     }
 
     render() {
-        if (this.props.status.loading) return <LoadingView />
-        else if (this.props.status.unsupported) return <MessageView message="Please, install Metamask for Chrome or Firefox" />
-        else if (this.props.status.networkId != "rinkeby") return <MessageView message="Please, switch to the Ropsten network" />
-        else if (!this.props.status.connected) return <MessageView message="Your connection seems to be down" />
-        else if (!this.props.accounts || !this.props.accounts.length) return <MessageView message="Please, unlock your wallet or create an account" />
+        if (this.props.status.loading) {
+            return <LoadingView />
+        } else if (this.props.status.unsupported) {
+            return <MessageView message="Please, install Metamask" />
+        } else if (this.props.status.networkId != "rinkeby"){
+            return <MessageView message="Please, switch Metamask to the Rinkeby network" />
+        }
+        else if (!this.props.status.connected) { 
+            return <MessageView message="Your connection seems to be down" />
+        }
+        else if (!this.props.accounts || !this.props.accounts.length) {
+            return <MessageView message="Please, unlock your wallet or create an account" />
+        }
 
         return <div>
             <Switch>

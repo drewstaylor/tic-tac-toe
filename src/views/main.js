@@ -1,9 +1,10 @@
-// web/src/views/main.js
-import React, { Component } from "react"
-import { connect } from "react-redux"
-import Web3 from "web3"
-import { Row, Col } from "antd"
-import Media from "react-media"
+// src/views/main.js
+
+import React, { Component } from 'react';
+import { connect } from 'react-redux';
+//import Web3 from 'web3';
+import { Row, Col } from 'antd';
+import Media from 'react-media';
 
 class MainView extends Component {
     renderMobile() {
