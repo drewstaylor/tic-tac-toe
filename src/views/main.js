@@ -250,31 +250,30 @@ class MainView extends Component {
                     <Divider />
 
                     <Row gutter={16}>
-                        <Col>
+                        <div className="create-game">
                             <Input className="margin-bottom" placeholder="Screen name" name="playerNickname" onChange={ev => this.handleValue(ev)} />
-                        </Col>
-                        <Col span={12}>
+                        </div>
+                        <div className="create-game">
                             <InputNumber className="width-100" min={0} placeholder="Random number" name="number" onChange={value => this.setState({ number: value })} />
-                        </Col>
-                        <Col span={12}>
+                        </div>
+                        <div className="create-game">
                             <Input placeholder="Type some text" name="salt" onChange={ev => this.handleValue(ev)} />
-                        </Col>
-                        <Col>
+                        </div>
+                        <div className="create-game">
                             <p className="light"><small>This will be used to randomly decide who starts the game</small></p>
-                        </Col>
-                        <Col>
-                            <br />
+                        </div>
+                        <div className="create-game">
                             <p className="light">Bet ether on the match outcome? (optional)</p>
-                        </Col>
-                        <Col>
+                        </div>
+                        <div className="create-game">
                             <InputNumber className="margin-bottom width-100" placeholder="My challenge bet" name="value" onChange={value => this.setState({ value })} />
-                        </Col>
-                        <Col>
+                        </div>
+                        <div className="create-game">
                             {
                                 this.state.creationLoading ? <div className="text-center">Please, wait  <Spin indicator={<Icon type="loading" style={{ fontSize: 14 }} spin />} /> </div> : <Button type="primary" id="start" className="width-100" onClick={() => this.createGame()}>Start new game</Button>
                             }
                             <Button type="primary" onClick={() => this.setState({ showCreateGame: !this.state.showCreateGame })}>Cancel</Button>
-                        </Col>
+                        </div>
                     </Row>
                 </div>
     }

@@ -1,11 +1,13 @@
+@import 'antd/dist/antd.css';
+
 table {
-    width: 500px;
-    height: 500px;
+    width: 400px;
+    height: 400px;
     border: 2px solid #333333;
 }
 
 td {
-    width: 162px;
+    max-width: 162px;
     min-height: 162px;
     border: 2px solid #333333;
 }
@@ -29,4 +31,28 @@ div.game-cell.cell-o {
     background-position: center;
     background-repeat: no-repeat;
     background-size: cover;
- }
+}
+
+button {
+    margin-right: 1.5rem;
+}
+
+input {
+    width: 100%;
+}
+
+.ant-input-number.width-100 {
+    width: 100%;
+}
+
+div.create-game {
+    margin-bottom: 1.5rem;
+}
+
+@media only screen and (max-width: 1000px) {
+    table {
+        width: 300px;
+        height: 300px;
+        border: 2px solid #333333;
+    }
+}
