@@ -234,12 +234,14 @@ class GameView extends Component {
 
     // Transactions
     checkConfirmGame(game) {
+        let data = null;
         if (this.state.confirmLoading || game.status != "0" || game.player2.match(/^0x0+$/) || game.player1 != this.props.accounts[0]) {
             return;
         }
 
         if (this.props.status.createdGames) {
-            let data = this.props.status.createdGames[this.props.match.params.id]
+            console.log('[this.props.status.createdGames, this.props.match.params.id]', [this.props.status.createdGames, this.props.match.params.id]);
+            data = this.props.status.createdGames[this.props.match.params.id];
             if (!data) {
                 return notification.error({
                     message: 'Failed to confirm the game',
@@ -253,9 +255,14 @@ class GameView extends Component {
 
         this.setState({ confirmLoading: true });
 
+        console.log('got here', data);
+
         return this.TicTacToe.methods.confirmGame(this.props.match.params.id, data.number, data.salt)
             .send({ from: this.props.accounts[0] })
             .then(tx => {
+
+                console.log('tx', tx);
+
                 this.setState({ confirmLoading: false });
 
                 if (!tx.events.GameStarted || !tx.events.GameStarted.returnValues) {
@@ -467,10 +474,10 @@ class GameView extends Component {
             return "-"; 
         } else if (this.state.game.status == "0") {
             if (this.state.game.player2.match(/^0x0+$/)) {
-                subject = (this.state.game.player1 == this.props.accounts[0]) ? "You" : this.state.game.nicknamePlayer1;
+                subject = (this.state.game.player1 == this.props.accounts[0]) ? "you" : this.state.game.nicknamePlayer1;
                 action = "cancel the game";
             } else {
-                subject = (this.state.game.player2 == this.props.accounts[0]) ? "You" : this.state.game.nicknamePlayer2;
+                subject = (this.state.game.player2 == this.props.accounts[0]) ? "you" : this.state.game.nicknamePlayer2;
                 action = "claim deposited ETH from the game contract";
             }
         }
@@ -478,7 +485,7 @@ class GameView extends Component {
             action = "claim deposited ETH from the game contract";
 
             if (this.state.game.player2 == this.props.accounts[0]) {
-                subject = "You";
+                subject = "you";
             } else {
                 subject = this.state.game.nicknamePlayer2;
             }
@@ -487,7 +494,7 @@ class GameView extends Component {
             action = "claim deposited ETH from the game contract";
 
             if (this.state.game.player1 == this.props.accounts[0]) {
-                subject = "You";
+                subject = "you";
             } else {
                 subject = this.state.game.nicknamePlayer1;
             }
@@ -579,7 +586,7 @@ class GameView extends Component {
         return <Row gutter={48}>
             <Col md={12}>
                 <div className="card">
-                    <h1 className="light">Current game</h1>
+                    <h3 className="light">Current Game</h3>
 
                     <Divider />
 
@@ -619,7 +626,7 @@ class GameView extends Component {
             </Col>
             <Col md={12}>
                 <div className="card">
-                    <h1 className="light">Game status</h1>
+                    <h3 className="light">Game Status</h3>
 
                     <Divider />
 

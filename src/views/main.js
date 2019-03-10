@@ -5,7 +5,7 @@ import { connect } from 'react-redux';
 import { Row, Col, Divider, Button, Input, InputNumber, Spin, Icon, message, notification } from 'antd';
 
 import { getOpenGames } from '../store/actions';
-import ConfirmAcceptModal from '../widgets/confirmAcceptModal';
+import ConfirmAcceptModal from '../views/partials/confirmAcceptModal';
 
 // Contracts
 import { getWebSocketWeb3, getInjectedWeb3, isWeb3Injected } from '../contracts/web3';

@@ -12,10 +12,9 @@ import { getOpenGames } from './store/actions';
 // Views
 import MainView from './views/main';
 import GameView from './views/game';
-// Views hardcoded
-const NewGameView = () => <div>New Game View</div>
-const LoadingView = () => <div>Loading View</div>
-const MessageView = props => <div>{props.message || ""}</div>
+import LoadingView from './views/loading';
+import MessageView from './views/message';
+import Container from './views/partials/container'
 
 class App extends Component {
     /**
@@ -113,13 +112,13 @@ class App extends Component {
             return <MessageView message="Please, unlock your wallet or create an account" />
         }
 
-        return <div>
+        return <Container>
             <Switch>
                 <Route path="/" exact component={MainView} />
                 <Route path="/games/:id" exact component={GameView} />
                 <Redirect to="/" />
             </Switch>
-        </div>
+        </Container>
     }
 }
 
