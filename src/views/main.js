@@ -71,9 +71,8 @@ class MainView extends Component {
                 this.setState({ creationLoading: true })
                 // Call create game
                 console.log("create game params =>", [hash, this.state.playerNickname, value, this.props.accounts[0]]);
-                console.log(TicTacToe);
                 return TicTacToe.methods.createGame(hash, this.state.playerNickname).send({
-                    value: value,
+                    value,
                     from: this.props.accounts[0]
                 });
             }).then(tx => {
@@ -88,17 +87,19 @@ class MainView extends Component {
                 // game creation successful
                 this.props.dispatch({
                     type: "ADD_CREATED_GAME",
-                    id: tx.events.GameCreated.returnValues.gameIdx,
+                    id: tx.events.GameCreated.returnValues.gameIndex,
                     number,
                     salt: this.state.salt
                 })
 
-                this.props.history.push(`/games/${tx.events.GameCreated.returnValues.gameIdx}`)
+                console.log('add created game =>',this.props);
+
+                this.props.history.push(`/games/${tx.events.GameCreated.returnValues.gameIndex}`);
 
                 notification.success({
                     message: 'Game created',
                     description: 'Your game has been created. Waiting for another user to accept it.',
-                })
+                });
             }).catch(err => {
                 // Handler errors
                 this.setState({ creationLoading: false })
@@ -107,8 +108,8 @@ class MainView extends Component {
                 notification.error({
                     message: 'Game creation failed',
                     description: msg
-                })
-            })
+                });
+            });
     }
 
     /**
@@ -150,10 +151,10 @@ class MainView extends Component {
                     // Game successfully accepted
                     this.props.history.push(`/games/${game.id}`);
 
-                    notification.success({
+                    /*notification.success({
                         message: 'Game accepted',
                         description: 'You have accepted the game. Waiting for creator to confirm.',
-                    });
+                    });*/
                     // Load open games
                     this.props.dispatch(getOpenGames());
                 })
@@ -230,7 +231,7 @@ class MainView extends Component {
             <div className="open-game-row-text">
                 <h1>Game: {game.id}</h1>
                 <p>Creator: {game.nicknamePlayer1}</p>
-                <p>Value of challenge {game.amount && game.amount != "0" ? <span>(Game Bet: {web3.utils.fromWei(game.amount)} ETH)</span> : <span> No bet placed on challenge</span>}</p>
+                <p>Value of challenge: {game.amount && game.amount != "0" ? <span>(Game Bet: {web3.utils.fromWei(game.amount)} ETH)</span> : <span> 0 (no bet included in challenge)</span>}</p>
                 <div className="open-game-row-accept">
                     <Button type="primary" onClick={() => this.showAcceptGameModal(index)}>Accept Game</Button>
                 </div>

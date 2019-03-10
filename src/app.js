@@ -10,8 +10,8 @@ import getTicTacToeInstance from './contracts/tictactoe';
 import { getOpenGames } from './store/actions';
 
 // Views
-import MainView from "./views/main"
-import GameView from "./views/game"
+import MainView from './views/main';
+import GameView from './views/game';
 // Views hardcoded
 const NewGameView = () => <div>New Game View</div>
 const LoadingView = () => <div>Loading View</div>
