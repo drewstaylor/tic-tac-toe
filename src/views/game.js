@@ -679,29 +679,17 @@ class GameView extends Component {
                             <tbody>
                                 <tr>
                                     <td><div id="cell-0" onClick={() => this.markPosition(0)} className={this.getCellClass(0)} /></td>
-                                    <td className="line" />
                                     <td><div id="cell-1" onClick={() => this.markPosition(1)} className={this.getCellClass(1)} /></td>
-                                    <td className="line" />
                                     <td><div id="cell-2" onClick={() => this.markPosition(2)} className={this.getCellClass(2)} /></td>
-                                </tr>
-                                <tr className="line">
-                                    <td colSpan={5} className="line" />
                                 </tr>
                                 <tr>
                                     <td><div id="cell-3" onClick={() => this.markPosition(3)} className={this.getCellClass(3)} /></td>
-                                    <td className="line" />
                                     <td><div id="cell-4" onClick={() => this.markPosition(4)} className={this.getCellClass(4)} /></td>
-                                    <td className="line" />
                                     <td><div id="cell-5" onClick={() => this.markPosition(5)} className={this.getCellClass(5)} /></td>
-                                </tr>
-                                <tr className="line">
-                                    <td colSpan={5} className="line" />
                                 </tr>
                                 <tr>
                                     <td><div id="cell-6" onClick={() => this.markPosition(6)} className={this.getCellClass(6)} /></td>
-                                    <td className="line" />
                                     <td><div id="cell-7" onClick={() => this.markPosition(7)} className={this.getCellClass(7)} /></td>
-                                    <td className="line" />
                                     <td><div id="cell-8" onClick={() => this.markPosition(8)} className={this.getCellClass(8)} /></td>
                                 </tr>
                             </tbody>

@@ -1,0 +1,11 @@
+table {
+    min-width: 500px;
+    min-height: 500px;
+    border: 2px solid #333333;
+}
+
+td {
+    min-width: 40px;
+    min-height: 40px;
+    border: 2px solid #333333;
+}
