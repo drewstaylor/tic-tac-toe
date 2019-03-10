@@ -257,7 +257,7 @@ class MainView extends Component {
                             <InputNumber className="width-100" min={0} placeholder="Random number" name="number" onChange={value => this.setState({ number: value })} />
                         </div>
                         <div className="create-game">
-                            <Input placeholder="Type some text" name="salt" onChange={ev => this.handleValue(ev)} />
+                            <Input placeholder="Game creator secret phrase" name="salt" onChange={ev => this.handleValue(ev)} />
                         </div>
                         <div className="create-game">
                             <p className="light"><small>This will be used to randomly decide who starts the game</small></p>
