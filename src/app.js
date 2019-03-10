@@ -14,7 +14,7 @@ import MainView from './views/main';
 import GameView from './views/game';
 import LoadingView from './views/loading';
 import MessageView from './views/message';
-import Container from './views/partials/container'
+import Container from './views/partials/container';
 
 class App extends Component {
     /**

@@ -124,17 +124,19 @@ class GameView extends Component {
         return this.getGameStatus().then(game => {
             this.setState({ game, loadingGameInfo: false })
 
+            console.log('positionMarked =>', game);
+
             if (game.status == 1) {
                 if (game.player1 == this.props.accounts[0])
-                    message.info(`${game.player2} has marked a cell`)
+                    message.info(`${game.player2} has marked a cell`);
             }
             else if (game.status == 2) {
                 if (game.player2 == this.props.accounts[0])
                     message.info(`${game.player1} has marked a cell`)
             }
 
-            return this.checkLastPositionLeft(game)
-        })
+            return this.checkLastPositionLeft(game);
+        });
     }
 
     /**
@@ -198,7 +200,7 @@ class GameView extends Component {
             notification[type]({
                 message,
                 description
-            })
+            });
         })
     }
 
@@ -567,97 +569,25 @@ class GameView extends Component {
     }
 
     /**
-     * Determine if a target cell is available to be played on
-     * @param {Number} index: Index of the cell, in the board array, to be analyzed
+     * Generate or modify html classNames to a target cell based on cell state.
+     * Cell classNames can then be used to display the 'X' / 'O' player turn values
+     * @param {Number} index: Index of the target cell
      */
     getCellClass(index) {
-        if (!this.state.game || !this.state.game.cells) return "cell"
-        switch (this.state.game.cells[index]) {
-            case "1": return "cell cell-x"
-            case "2": return "cell cell-o"
-            default: return "cell"
+        if (!this.state.game || !this.state.game.cells) {
+            return "game-cell";
+        }
+        switch (parseInt(this.state.game.cells[index])) {
+            case 1: 
+                return "game-cell cell-x";
+            case 2: 
+                return "game-cell cell-o";
+            default: 
+                return "game-cell";
         }
     }
 
     // RENDER
-    renderDesktop() {
-        let web3 = getWebSocketWeb3();
-
-        return <Row gutter={48}>
-            <Col md={12}>
-                <div className="card">
-                    <h3 className="light">Current Game</h3>
-
-                    <Divider />
-
-                    <table id="board">
-                        <tbody>
-                            <tr>
-                                <td><div id="cell-0" onClick={() => this.markPosition(0)} className={this.getCellClass(0)} /></td>
-                                <td className="line" />
-                                <td><div id="cell-1" onClick={() => this.markPosition(1)} className={this.getCellClass(1)} /></td>
-                                <td className="line" />
-                                <td><div id="cell-2" onClick={() => this.markPosition(2)} className={this.getCellClass(2)} /></td>
-                            </tr>
-                            <tr className="line">
-                                <td colSpan={5} className="line" />
-                            </tr>
-                            <tr>
-                                <td><div id="cell-3" onClick={() => this.markPosition(3)} className={this.getCellClass(3)} /></td>
-                                <td className="line" />
-                                <td><div id="cell-4" onClick={() => this.markPosition(4)} className={this.getCellClass(4)} /></td>
-                                <td className="line" />
-                                <td><div id="cell-5" onClick={() => this.markPosition(5)} className={this.getCellClass(5)} /></td>
-                            </tr>
-                            <tr className="line">
-                                <td colSpan={5} className="line" />
-                            </tr>
-                            <tr>
-                                <td><div id="cell-6" onClick={() => this.markPosition(6)} className={this.getCellClass(6)} /></td>
-                                <td className="line" />
-                                <td><div id="cell-7" onClick={() => this.markPosition(7)} className={this.getCellClass(7)} /></td>
-                                <td className="line" />
-                                <td><div id="cell-8" onClick={() => this.markPosition(8)} className={this.getCellClass(8)} /></td>
-                            </tr>
-                        </tbody>
-                    </table>
-
-                </div>
-            </Col>
-            <Col md={12}>
-                <div className="card">
-                    <h3 className="light">Game Status</h3>
-
-                    <Divider />
-
-                    {
-                        (this.state.loadingGameInfo || this.state.confirmLoading || this.state.markLoading || this.state.withdrawLoading) ?
-                            <div className="loading-spinner">Waiting  <Spin indicator={<Icon type="loading" style={{ fontSize: 14 }} spin />} /> </div> :
-                            <div>
-                                <p id="status" className="light">{this.getStatus()}</p>
-                                <p id="timer" className="light">{this.getTimeStatus()}</p>
-                                {
-                                    this.state.game ? <p id="bet" className="light">Game bet: {web3.utils.fromWei(this.state.game.amount)} Ξ</p> : null
-                                }
-
-                                {
-                                    (this.canWithdraw() && this.state.game && this.state.game.amount != 0) ? [
-                                        <Divider key="0" />,
-                                        <Button id="withdraw" key="1" type="primary" className="width-100"
-                                            onClick={() => this.requestWithdrawal()}>Withdraw {web3.utils.fromWei(this.state.game.amount)} Ξ</Button>,
-                                        <br key="3" />,
-                                        <br key="4" />
-                                    ] : null
-                                }
-                                <Button id="back" type="primary" className="width-100" onClick={() => this.goBack()}>Go back</Button>
-                            </div>
-                    }
-
-                </div>
-            </Col>
-        </Row>
-    }
-
     render() {
         let web3 = getWebSocketWeb3();
         if (this.state.loadingGameInfo) {
