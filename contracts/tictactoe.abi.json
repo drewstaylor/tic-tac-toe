@@ -1,164 +1,5 @@
 [
 	{
-		"constant": true,
-		"inputs": [
-			{
-				"name": "gameIndex",
-				"type": "uint32"
-			}
-		],
-		"name": "getGamePlayers",
-		"outputs": [
-			{
-				"name": "player1",
-				"type": "address"
-			},
-			{
-				"name": "player2",
-				"type": "address"
-			}
-		],
-		"payable": false,
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"constant": false,
-		"inputs": [
-			{
-				"name": "randomNumberHash",
-				"type": "bytes32"
-			},
-			{
-				"name": "playerNickname",
-				"type": "string"
-			}
-		],
-		"name": "createGame",
-		"outputs": [
-			{
-				"name": "gameIndex",
-				"type": "uint32"
-			}
-		],
-		"payable": true,
-		"stateMutability": "payable",
-		"type": "function"
-	},
-	{
-		"constant": true,
-		"inputs": [
-			{
-				"name": "gameIndex",
-				"type": "uint32"
-			}
-		],
-		"name": "getGameTimestamp",
-		"outputs": [
-			{
-				"name": "lastTransaction",
-				"type": "uint256"
-			}
-		],
-		"payable": false,
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"constant": false,
-		"inputs": [
-			{
-				"name": "gameIndex",
-				"type": "uint32"
-			},
-			{
-				"name": "revealedRandomNumber",
-				"type": "uint8"
-			},
-			{
-				"name": "revealedSalt",
-				"type": "string"
-			}
-		],
-		"name": "confirmGame",
-		"outputs": [],
-		"payable": false,
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"constant": true,
-		"inputs": [
-			{
-				"name": "randomNumber",
-				"type": "uint8"
-			},
-			{
-				"name": "salt",
-				"type": "string"
-			}
-		],
-		"name": "saltedHash",
-		"outputs": [
-			{
-				"name": "",
-				"type": "bytes32"
-			}
-		],
-		"payable": false,
-		"stateMutability": "pure",
-		"type": "function"
-	},
-	{
-		"constant": true,
-		"inputs": [],
-		"name": "timeout",
-		"outputs": [
-			{
-				"name": "",
-				"type": "uint16"
-			}
-		],
-		"payable": false,
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"constant": true,
-		"inputs": [
-			{
-				"name": "gameIndex",
-				"type": "uint32"
-			}
-		],
-		"name": "getGameInfo",
-		"outputs": [
-			{
-				"name": "cells",
-				"type": "uint8[9]"
-			},
-			{
-				"name": "status",
-				"type": "uint8"
-			},
-			{
-				"name": "amount",
-				"type": "uint256"
-			},
-			{
-				"name": "nicknamePlayer1",
-				"type": "string"
-			},
-			{
-				"name": "nicknamePlayer2",
-				"type": "string"
-			}
-		],
-		"payable": false,
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
 		"constant": false,
 		"inputs": [
 			{
@@ -186,12 +27,43 @@
 			{
 				"name": "gameIndex",
 				"type": "uint32"
+			},
+			{
+				"name": "revealedRandomNumber",
+				"type": "uint8"
+			},
+			{
+				"name": "revealedSalt",
+				"type": "string"
 			}
 		],
-		"name": "withdraw",
+		"name": "confirmGame",
 		"outputs": [],
 		"payable": false,
 		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"constant": false,
+		"inputs": [
+			{
+				"name": "randomNumberHash",
+				"type": "bytes32"
+			},
+			{
+				"name": "playerNickname",
+				"type": "string"
+			}
+		],
+		"name": "createGame",
+		"outputs": [
+			{
+				"name": "gameIndex",
+				"type": "uint32"
+			}
+		],
+		"payable": true,
+		"stateMutability": "payable",
 		"type": "function"
 	},
 	{
@@ -213,40 +85,17 @@
 		"type": "function"
 	},
 	{
-		"constant": true,
+		"constant": false,
 		"inputs": [
 			{
 				"name": "gameIndex",
 				"type": "uint32"
 			}
 		],
-		"name": "getGameWithdrawals",
-		"outputs": [
-			{
-				"name": "player1",
-				"type": "bool"
-			},
-			{
-				"name": "player2",
-				"type": "bool"
-			}
-		],
+		"name": "withdraw",
+		"outputs": [],
 		"payable": false,
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"constant": true,
-		"inputs": [],
-		"name": "getOpenGames",
-		"outputs": [
-			{
-				"name": "",
-				"type": "uint32[]"
-			}
-		],
-		"payable": false,
-		"stateMutability": "view",
+		"stateMutability": "nonpayable",
 		"type": "function"
 	},
 	{
@@ -344,5 +193,156 @@
 		],
 		"name": "GameEnded",
 		"type": "event"
+	},
+	{
+		"constant": true,
+		"inputs": [
+			{
+				"name": "gameIndex",
+				"type": "uint32"
+			}
+		],
+		"name": "getGameInfo",
+		"outputs": [
+			{
+				"name": "cells",
+				"type": "uint8[9]"
+			},
+			{
+				"name": "status",
+				"type": "uint8"
+			},
+			{
+				"name": "amount",
+				"type": "uint256"
+			},
+			{
+				"name": "nicknamePlayer1",
+				"type": "string"
+			},
+			{
+				"name": "nicknamePlayer2",
+				"type": "string"
+			}
+		],
+		"payable": false,
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"constant": true,
+		"inputs": [
+			{
+				"name": "gameIndex",
+				"type": "uint32"
+			}
+		],
+		"name": "getGamePlayers",
+		"outputs": [
+			{
+				"name": "player1",
+				"type": "address"
+			},
+			{
+				"name": "player2",
+				"type": "address"
+			}
+		],
+		"payable": false,
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"constant": true,
+		"inputs": [
+			{
+				"name": "gameIndex",
+				"type": "uint32"
+			}
+		],
+		"name": "getGameTimestamp",
+		"outputs": [
+			{
+				"name": "lastTransaction",
+				"type": "uint256"
+			}
+		],
+		"payable": false,
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"constant": true,
+		"inputs": [
+			{
+				"name": "gameIndex",
+				"type": "uint32"
+			}
+		],
+		"name": "getGameWithdrawals",
+		"outputs": [
+			{
+				"name": "player1",
+				"type": "bool"
+			},
+			{
+				"name": "player2",
+				"type": "bool"
+			}
+		],
+		"payable": false,
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"constant": true,
+		"inputs": [],
+		"name": "getOpenGames",
+		"outputs": [
+			{
+				"name": "",
+				"type": "uint32[]"
+			}
+		],
+		"payable": false,
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"constant": true,
+		"inputs": [
+			{
+				"name": "randomNumber",
+				"type": "uint8"
+			},
+			{
+				"name": "salt",
+				"type": "string"
+			}
+		],
+		"name": "saltedHash",
+		"outputs": [
+			{
+				"name": "",
+				"type": "bytes32"
+			}
+		],
+		"payable": false,
+		"stateMutability": "pure",
+		"type": "function"
+	},
+	{
+		"constant": true,
+		"inputs": [],
+		"name": "timeout",
+		"outputs": [
+			{
+				"name": "",
+				"type": "uint16"
+			}
+		],
+		"payable": false,
+		"stateMutability": "view",
+		"type": "function"
 	}
 ]

@@ -1,33 +1,100 @@
 // src/app.js
 
 import React, { Component } from 'react';
-import { Route, Switch, Redirect } from 'react-router-dom';
+import { Route, Switch, Redirect, withRouter } from 'react-router-dom';
 import { connect } from 'react-redux';
-import Web3 from 'web3';
 
-const MainView = () => <div>Main View</div>
+// Contracts
+import { isWeb3Injected, getInjectedWeb3 } from './contracts/web3';
+import getTicTacToeInstance from './contracts/tictactoe';
+import { getOpenGames } from './store/actions';
+
+// Views
+import MainView from "./views/main"
 const NewGameView = () => <div>New Game View</div>
 const GameView = () => <div>Game View</div>
-
 const LoadingView = () => <div>Loading View</div>
 const MessageView = props => <div>{props.message || ""}</div>
 
 class App extends Component {
+    /**
+     * Loads Web3, checks network and account settings, then loads an 
+     * instance of the TicTacToe contract
+     */
     componentDidMount() {
-        // Check for web3 provider
-        if (window.web3 && window.web3.currentProvider) {
-            window.web3 = new Web3(window.web3.currentProvider)
-            web3.eth.net.getNetworkType().then(id => {
-                this.props.dispatch({ type: "SET_NETWORK_ID", networkId: id })
-                return web3.eth.getAccounts()
-            }).then(accounts => {
-                this.props.dispatch({ type: "SET", accounts })
-                this.props.dispatch({ type: "SET_CONNECTED" })
+        if (isWeb3Injected()) {
+            let web3 = getInjectedWeb3();
+            this.TicTacToe = getTicTacToeInstance();
+
+            web3.eth.getBlockNumber().then(blockNumber => {
+                this.props.dispatch({ type: "SET_STARTING_BLOCK", blockNumber });
+                return this.checkWeb3Status();
+            }).then(() => {
+                // Make sure we don't lose our Web3 access
+                this.checkWeb3Status();
+                this.props.dispatch(getOpenGames());
+                // Start listening for contract events
+                this.addListeners();
             })
         }
         else {
             this.props.dispatch({ type: "SET_UNSUPPORTED" })
         }
+    }
+
+    /**
+     * Check for Web3 connection, correct network and wallet account
+     */
+    checkWeb3Status() {
+        let web3 = getInjectedWeb3();
+        return web3.eth.net.isListening().then(listening => {
+            if (!listening) {
+                return this.props.dispatch({ type: "SET_DISCONNECTED" });
+            }
+
+            return web3.eth.net.getNetworkType().then(id => {
+                this.props.dispatch({ type: "SET_NETWORK_ID", networkId: id });
+
+                return web3.eth.getAccounts().then(accounts => {
+                    if (accounts.length != this.props.accounts.length || accounts[0] != this.props.accounts[0]) {
+                        this.props.dispatch({ type: "SET", accounts });
+                    }
+                    this.props.dispatch({ type: "SET_CONNECTED" });
+                });
+            });
+        });
+    }
+
+    // On game created
+    onGameCreated(event) {
+        console.log('Game Created =>', event.returnValues);
+        this.props.dispatch(getOpenGames());
+    }
+
+    // On game accepted
+    onGameAccepted(event) {
+        console.log('Game Accepted =>', event.returnValues);
+        this.props.dispatch(getOpenGames());
+    }
+
+    // Listen for contract events
+    addListeners() {
+        this.creationEvent = this.TicTacToe.events.GameCreated({
+            fromBlock: this.props.status.startingBlock || 0
+        })
+        .on('data', event => this.onGameCreated(event))
+        .on('error', function (err) {
+            console.log(err);
+        });
+
+        this.acceptedEvent = this.TicTacToe.events.GameAccepted({
+            filter: { opponent: this.props.accounts && this.props.accounts[0] },
+            fromBlock: this.props.status.startingBlock || 0
+        })
+        .on('data', event => this.onGameAccepted(event))
+        .on('error', function (err) {
+            console.log(err);
+        });
     }
 
     render() {
@@ -55,4 +122,4 @@ class App extends Component {
     }
 }
 
-export default connect(({ accounts, status }) => ({ accounts, status }))(App)
+export default withRouter(connect(({ accounts, status, openGames }) => ({ accounts, status, openGames }))(App))
