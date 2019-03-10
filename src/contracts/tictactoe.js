@@ -23,6 +23,6 @@ export default function (useBrowserWeb3 = false) {
         web3 = getWebSocketWeb3();
     }
     
-    let instance =  web3.eth.Contract(contract.abi, contract.address);
+    let instance = new web3.eth.Contract(contract.abi, contract.address);
     return instance;
 }
