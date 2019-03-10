@@ -112,62 +112,6 @@ class MainView extends Component {
     }
 
     /**
-     * Start a game
-     */
-    startGame() {
-        // Verify game paremeters
-        if (!this.state.playerNickname) {
-            return message.error("Please, choose a screen name");
-        } else if (this.state.playerNickname.length < 3) {
-            return message.error("Please, choose a longer screen name (min. 3 characters)");
-        }
-        else if (typeof this.state.number == "undefined") {
-            return message.error("Please, choose a random number to generate a game hash"); 
-        } else if (!this.state.salt) {
-            return message.error("Please, type a secret phrase to secure your game hash");
-        }
-
-        return this.TicTacToe.methods.saltedHash(this.state.number, this.state.salt).call()
-            .then(hash => {
-                let value = 0
-                // If we're sending a bet on our game
-                if (this.state.value) {
-                    value = web3.utils.toWei(String(this.state.value), "ether")
-                }
-
-                // Game start loading
-                this.setState({ creationLoading: true });
-                // Call contract createGame()
-                return TicTacToe.methods.createGame(hash, this.state.playerNickname).send({ value: value, from: this.props.accounts[0] })
-            }).then(tx => {
-                // Game creation called
-                this.setState({ creationLoading: false });
-                
-                // If the transaction failed:
-                if (!tx.events.GameCreated || !tx.events.GameCreated.returnValues) {
-                    throw new Error("The transaction failed")
-                }
-
-                // Otherwise, business as usual
-                // game start successful
-                this.props.dispatch({
-                    type: "ADD_CREATED_GAME",
-                    id: tx.events.GameCreated.returnValues.gameIdx,
-                    number: this.state.number,
-                    salt: this.state.salt
-                })
-
-                this.props.history.push(`/games/${tx.events.GameCreated.returnValues.gameIdx}`)
-                message.info("Your game has been created. Waiting for another user to accept it.")
-            }).catch(err => {
-                // Error handling
-                this.setState({ creationLoading: false })
-                let msg = err.message.replace(/\.$/, "").replace(/Returned error: Error: MetaMask Tx Signature: /, "")
-                message.error(msg)
-            })
-    }
-
-    /**
      * Accept a challenge
      */
     acceptGame() {
