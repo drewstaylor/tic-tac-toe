@@ -783,7 +783,7 @@ class GameView extends Component {
                                         (this.canWithdraw() && this.state.game && this.state.game.amount != 0) ? [
                                             <Divider key="0" />,
                                             <Button id="withdraw" key="1" type="primary" className="width-100"
-                                                onClick={() => this.requestWithdrawal()}>Withdraw {web3.utils.fromWei(this.state.game.amount)}</Button>,
+                                                onClick={() => this.requestWithdrawal()}>Withdraw&nbsp;{web3.utils.fromWei(this.state.game.amount)}</Button>,
                                             <br key="3" />,
                                             <br key="4" />
                                         ] : null
