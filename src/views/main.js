@@ -96,10 +96,28 @@ class MainView extends Component {
 
                 this.props.history.push(`/games/${tx.events.GameCreated.returnValues.gameIndex}`);
 
-                notification.success({
-                    message: 'Game created',
-                    description: 'Your game has been created. Waiting for another user to accept it.',
-                });
+                // Send notification / handle duplicate notifications
+                let notificationsPushed = null;
+                if (localStorage.getItem('game_' + tx.events.GameCreated.returnValues.gameIndex)) {
+                    notificationsPushed = (JSON.parse(localStorage.getItem('game_' + tx.events.GameCreated.returnValues.gameIndex))) ? JSON.parse(localStorage.getItem('game_' + tx.events.GameCreated.returnValues.gameIndex)) : {};
+                    if (!notificationsPushed.hasOwnProperty('created')) {
+                        notification.success({
+                            message: 'Game created',
+                            description: 'Your game has been created. Waiting for another user to accept it.',
+                        });
+                        notificationsPushed.created = true;
+                        localStorage.setItem('game_' + tx.events.GameCreated.returnValues.gameIndex, JSON.stringify(notificationsPushed));
+                    }
+                } else {
+                    notification.success({
+                        message: 'Game created',
+                        description: 'Your game has been created. Waiting for another user to accept it.',
+                    });
+                    notificationsPushed = {
+                        created: true
+                    };
+                    localStorage.setItem('game_' + tx.events.GameCreated.returnValues.gameIndex, JSON.stringify(notificationsPushed));
+                }
             }).catch(err => {
                 // Handler errors
                 this.setState({ creationLoading: false })
@@ -151,10 +169,28 @@ class MainView extends Component {
                     // Game successfully accepted
                     this.props.history.push(`/games/${game.id}`);
 
-                    /*notification.success({
-                        message: 'Game accepted',
-                        description: 'You have accepted the game. Waiting for creator to confirm.',
-                    });*/
+                    // Send notification / handle duplicate notifications
+                    let notificationsPushed = null;
+                    if (localStorage.getItem('game_' + game.id)) { 
+                        notificationsPushed = (JSON.parse(localStorage.getItem('game_' + game.id))) ? JSON.parse(localStorage.getItem('game_' + game.id)) : {};
+                        if (!notificationsPushed.hasOwnProperty('accepted')) {
+                            notification.success({
+                                message: 'Game accepted',
+                                description: 'You have accepted the game. Waiting for creator to confirm.',
+                            });
+                            notificationsPushed.accepted = true;
+                            localStorage.setItem('game_' + game.id, JSON.stringify(notificationsPushed));
+                        }
+                    } else {
+                        notification.success({
+                            message: 'Game accepted',
+                            description: 'You have accepted the game. Waiting for creator to confirm.',
+                        });
+                        notificationsPushed = {
+                            accepted: true
+                        };
+                        localStorage.setItem('game_' + game.id, JSON.stringify(notificationsPushed));
+                    }
                     // Load open games
                     this.props.dispatch(getOpenGames());
                 })

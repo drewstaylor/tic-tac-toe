@@ -95,10 +95,28 @@ class GameView extends Component {
 
             console.log('gameAccepted =>', game);
 
-            notification.success({
-                message: 'Game accepted',
-                description: `${game.player2} has accepted the game!`
-            })
+            // Send notification / handle duplicate notifications
+            let notificationsPushed = null;
+            if (localStorage.getItem('game_' + game.id)) {
+                notificationsPushed = (JSON.parse(localStorage.getItem('game_' + game.id))) ? JSON.parse(localStorage.getItem('game_' + game.id)) : {};
+                if (!notificationsPushed.hasOwnProperty('accepted')) {
+                    notification.success({
+                        message: 'Game accepted',
+                        description: `${game.player2} has accepted the game!`
+                    });
+                    notificationsPushed.accepted = true;
+                    localStorage.setItem('game_' + game.id, JSON.stringify(notificationsPushed));
+                }
+            } else {
+                notification.success({
+                    message: 'Game accepted',
+                    description: `${game.player2} has accepted the game!`
+                });
+                notificationsPushed = {
+                    accepted: true
+                };
+                localStorage.setItem('game_' + game.id, JSON.stringify(notificationsPushed));
+            }
             return this.checkConfirmGame(game);
         })
     }
@@ -110,33 +128,98 @@ class GameView extends Component {
         return this.getGameStatus().then(game => {
             this.setState({ game, loadingGameInfo: false });
 
-            notification.success({
-                message: 'Game confirmed',
-                description: `${game.player1} has confirmed the game!`
-            })
+            let notificationsPushed = null;
+            if (localStorage.getItem('game_' + game.id)) {
+                notificationsPushed = (JSON.parse(localStorage.getItem('game_' + game.id))) ? JSON.parse(localStorage.getItem('game_' + game.id)) : {};
+                if (!notificationsPushed.hasOwnProperty('started')) {
+                    notification.success({
+                        message: 'Game confirmed',
+                        description: `${game.player1} has confirmed the game!`
+                    });
+                    notificationsPushed.started = true;
+                    localStorage.setItem('game_' + game.id, JSON.stringify(notificationsPushed));
+                }
+            } else {
+                notification.success({
+                    message: 'Game confirmed',
+                    description: `${game.player1} has confirmed the game!`
+                });
+                notificationsPushed = {
+                    started: true
+                };
+                localStorage.setItem('game_' + game.id, JSON.stringify(notificationsPushed));
+            }
         })
     }
 
     /**
      * A turn was submitted
      */
-    onPositionMarked() {
-        return this.getGameStatus().then(game => {
-            this.setState({ game, loadingGameInfo: false })
-
-            console.log('positionMarked =>', game);
-
-            if (game.status == 1) {
-                if (game.player1 == this.props.accounts[0])
-                    message.info(`${game.player2} has marked a cell`);
-            }
-            else if (game.status == 2) {
-                if (game.player2 == this.props.accounts[0])
-                    message.info(`${game.player1} has marked a cell`)
-            }
-
-            return this.checkLastPositionLeft(game);
-        });
+    onPositionMarked(event) {
+        const gameId = event.returnValues.gameIndex;
+        if (gameId !== "undefined") {
+            return this.getGameStatus().then(game => {
+                this.setState({ game, loadingGameInfo: false })
+    
+                //console.log('positionMarked =>', [game, gameId]);
+                
+                // Last game action
+                const lastTx = game.lastTransaction;
+                
+                // Send notification / handle duplicate notifications
+                let notificationsPushed = null;
+                if (localStorage.getItem('game_' + gameId)) {
+                    notificationsPushed = JSON.parse(localStorage.getItem('game_' + gameId));
+                    if (notificationsPushed.hasOwnProperty('lastTransaction')) {
+                        // Is the first game play action
+                        if (parseInt(lastTx) !== parseInt(notificationsPushed.lastTransaction)) {
+                            if (game.status == 1) {
+                                if (game.player1 == this.props.accounts[0]) {
+                                    message.info('Challenger has played a turn');
+                                }
+                            } else if (game.status == 2) {
+                                if (game.player2 == this.props.accounts[0]) {
+                                    message.info('Creator has played a turn');
+                                }
+                            }
+                            notificationsPushed.lastTransaction = lastTx;
+                            localStorage.setItem('game_' + gameId, JSON.stringify(notificationsPushed));
+                        }
+                    } else {
+                        // Is not the first game play action
+                        if (game.status == 1) {
+                            if (game.player1 == this.props.accounts[0]) {
+                                message.info('Challenger has played a turn');
+                            }
+                        } else if (game.status == 2) {
+                            if (game.player2 == this.props.accounts[0]) {
+                                message.info('Creator has played a turn');
+                            }
+                        }
+                        notificationsPushed.lastTransaction = lastTx;
+                        localStorage.setItem('game_' + gameId, JSON.stringify(notificationsPushed));
+                    }
+                } else {
+                    // Fallback should not get called unless the target
+                    // player logs into same game with another browser or device
+                    if (game.status == 1) {
+                        if (game.player1 == this.props.accounts[0]) {
+                            message.info('Challenger has played a turn');
+                        }
+                    } else if (game.status == 2) {
+                        if (game.player2 == this.props.accounts[0]) {
+                            message.info('Creator has played a turn');
+                        }
+                    }
+                    notificationsPushed = {
+                        lastTransaction: lastTx
+                    };
+                    localStorage.setItem('game_' + gameId, JSON.stringify(notificationsPushed));
+                }
+    
+                return this.checkLastPositionLeft(game);
+            });
+        }
     }
 
     /**
@@ -197,10 +280,28 @@ class GameView extends Component {
                 else return
             }
 
-            notification[type]({
-                message,
-                description
-            });
+            // Send notification / handle duplicate notifications
+            let notificationsPushed = null;
+            if (localStorage.getItem('game_' + game.id)) { 
+                notificationsPushed = (JSON.parse(localStorage.getItem('game_' + game.id))) ? JSON.parse(localStorage.getItem('game_' + game.id)) : {};
+                if (!notificationsPushed.hasOwnProperty('ended')) {
+                    notification[type]({
+                        message,
+                        description
+                    });
+                    notificationsPushed.ended = true;
+                    localStorage.setItem('game_' + game.id, JSON.stringify(notificationsPushed));
+                }
+            } else {
+                notification[type]({
+                    message,
+                    description
+                });
+                notificationsPushed = {
+                    ended: true
+                };
+                localStorage.setItem('game_' + game.id, JSON.stringify(notificationsPushed));
+            }
         })
     }
 
@@ -242,7 +343,6 @@ class GameView extends Component {
         }
 
         if (this.props.status.createdGames) {
-            console.log('[this.props.status.createdGames, this.props.match.params.id]', [this.props.status.createdGames, this.props.match.params.id]);
             data = this.props.status.createdGames[this.props.match.params.id];
             if (!data) {
                 return notification.error({
@@ -269,10 +369,28 @@ class GameView extends Component {
                     throw new Error("The transaction failed");
                 }
 
-                notification.success({
-                    message: 'Game confirmed',
-                    description: 'The game is on. Good luck!',
-                });
+                // Send notification / handle duplicate notifications
+                let notificationsPushed = null;
+                if (localStorage.getItem('game_' + game.id)) { 
+                    notificationsPushed = (JSON.parse(localStorage.getItem('game_' + game.id))) ? JSON.parse(localStorage.getItem('game_' + game.id)) : {};
+                    if (!notificationsPushed.hasOwnProperty('confirmed')) {
+                        notification.success({
+                            message: 'Game confirmed',
+                            description: 'The game is on. Good luck!',
+                        });
+                        notificationsPushed.confirmed = true;
+                        localStorage.setItem('game_' + game.id, JSON.stringify(notificationsPushed));
+                    }
+                } else {
+                    notification.success({
+                        message: 'Game confirmed',
+                        description: 'The game is on. Good luck!',
+                    });
+                    notificationsPushed = {
+                        confirmed: true
+                    };
+                    localStorage.setItem('game_' + game.id, JSON.stringify(notificationsPushed));
+                }
                 this.props.dispatch({ type: "REMOVE_CREATED_GAME", id: game.id });
 
                 return this.getGameStatus().then(game => {
@@ -384,19 +502,39 @@ class GameView extends Component {
             });
     }
 
+    /**
+     * Withdraw outstanding balances from invalid or won games, after
+     * game duration grace period has expired
+     */
     requestWithdrawal() {
-
         this.setState({ withdrawLoading: true });
-
         return this.TicTacToe.methods.withdraw(this.props.match.params.id)
             .send({ from: this.props.accounts[0] })
             .then(tx => {
-                this.setState({ withdrawLoading: false })
+                this.setState({ withdrawLoading: false });
 
-                notification.success({
-                    message: "Success",
-                    description: "The money has been withdrawn"
-                });
+                // Send notification / handle duplicate notifications
+                let notificationsPushed = null;
+                if (localStorage.getItem('game_' + this.props.match.params.id)) { 
+                    notificationsPushed = (JSON.parse(localStorage.getItem('game_' + this.props.match.params.id))) ? JSON.parse(localStorage.getItem('game_' + this.props.match.params.id)) : {};
+                    if (!notificationsPushed.hasOwnProperty('withdrawn')) {
+                        notification.success({
+                            message: "Success",
+                            description: "The money has been withdrawn"
+                        });
+                        notificationsPushed.withdrawn = true;
+                        localStorage.setItem('game_' + this.props.match.params.id, JSON.stringify(notificationsPushed));
+                    }
+                } else {
+                    notification.success({
+                        message: "Success",
+                        description: "The money has been withdrawn"
+                    });
+                    notificationsPushed = {
+                        withdrawn: true
+                    };
+                    localStorage.setItem('game_' + this.props.match.params.id, JSON.stringify(notificationsPushed));
+                }
 
                 this.setState({ loadingGameInfo: true });
 
