@@ -1,4 +1,4 @@
-// web/src/reducers/accounts.js
+// src/reducers/accounts.js
 
 const initialState = [];
 

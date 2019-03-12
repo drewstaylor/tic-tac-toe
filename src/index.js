@@ -1,12 +1,12 @@
-// web/src/index.js
+// src/index.js
 
-import React from "react"
-import ReactDOM from "react-dom"
-import { Provider } from 'react-redux'  // Add this line
-import { HashRouter } from "react-router-dom"
-import App from "./app.js"
+import React from 'react';
+import ReactDOM from 'react-dom';
+import { Provider } from 'react-redux';
+import { HashRouter } from 'react-router-dom';
+import App from './app.js';
 
-import store from "./store"  // Add this line
+import store from './store';
 
 const Root = () => <Provider store={store}>
     <HashRouter>
@@ -14,4 +14,4 @@ const Root = () => <Provider store={store}>
     </HashRouter>
 </Provider>
 
-ReactDOM.render(<Root />, document.getElementById("root"))
+ReactDOM.render(<Root />, document.getElementById("root"));
