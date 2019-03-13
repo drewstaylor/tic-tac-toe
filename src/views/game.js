@@ -278,7 +278,7 @@ class GameView extends Component {
                 });
             })
             .catch(err => {
-                this.setState({ confirmLoading: false })
+                this.setState({ confirmLoading: false });
 
                 let msg = err.message.replace(/\.$/, "").replace(/Returned error: Error: MetaMask Tx Signature: /, "");
                 notification.error({
