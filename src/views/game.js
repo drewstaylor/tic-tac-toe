@@ -255,8 +255,6 @@ class GameView extends Component {
 
         this.setState({ confirmLoading: true });
 
-        console.log('got here', data);
-
         return this.TicTacToe.methods.confirmGame(this.props.match.params.id, data.number, data.salt)
             .send({ from: this.props.accounts[0] })
             .then(tx => {
