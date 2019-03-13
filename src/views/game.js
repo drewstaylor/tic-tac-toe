@@ -73,7 +73,7 @@ class GameView extends Component {
     }
 
     /**
-     * Handle unsubscriptions
+     * Handle unsubscriptions - protect memory leaks when changing views
      */
     componentWillUnmount() {
         if (this.acceptedEvent)
@@ -87,7 +87,7 @@ class GameView extends Component {
     }
 
     /**
-     * A new challenger approaches
+     * A new challenger approaches - sends UI notification on game accepted
      */
     onGameAccepted() {
         return this.getGameStatus().then(game => {
@@ -100,11 +100,11 @@ class GameView extends Component {
                 description: `${game.player2} has accepted the game!`
             })
             return this.checkConfirmGame(game);
-        })
+        });
     }
 
     /**
-     * Get ready to play
+     * Get ready to play - sends UI notification on game started
      */
     onGameStarted() {
         return this.getGameStatus().then(game => {
@@ -118,27 +118,7 @@ class GameView extends Component {
     }
 
     /**
-     * A turn was submitted
-     */
-    onPositionMarked() {
-        return this.getGameStatus().then(game => {
-            this.setState({ game, loadingGameInfo: false })
-
-            if (game.status == 1) {
-                if (game.player1 == this.props.accounts[0])
-                    message.info(`${game.player2} has marked a cell`)
-            }
-            else if (game.status == 2) {
-                if (game.player2 == this.props.accounts[0])
-                    message.info(`${game.player1} has marked a cell`)
-            }
-
-            return this.checkLastPositionLeft(game)
-        })
-    }
-
-    /**
-     * Game over
+     * Game over - updates view based on game status game ended
      */
     onGameEnded() {
         return this.getGameStatus().then(game => {
@@ -198,11 +178,12 @@ class GameView extends Component {
             notification[type]({
                 message,
                 description
-            })
+            });
         })
     }
 
-    // Call helper
+    // Get current game status from blockchain / EVM
+    // Do we need to accept / confirm the game, play a turn, or withdraw a reward?
     getGameStatus() {
 
         const result = {}
@@ -229,7 +210,7 @@ class GameView extends Component {
             result.withdrawn2 = withdrawals.player2
 
             return result;
-        })
+        });
     }
 
     // Transactions
@@ -288,137 +269,13 @@ class GameView extends Component {
             });
     }
 
-    checkLastPositionLeft(game) {
-        if (this.state.markLoading) return
-
-        // Automatically mark a cell if only one position is left
-
-        if ((game.status != "1" && game.status != "2") ||
-            (game.status == "1" && game.player1 != this.props.accounts[0]) ||
-            (game.status == "2" && game.player2 != this.props.accounts[0])) {
-            return;
-        }
-        let empty = game.cells.reduce((prev, cur) => {
-            if (cur == "0") return prev + 1;
-            return prev;
-        }, 0)
-        if (empty != 1) {
-            return;
-        }
-
-        let cell = game.cells.findIndex(c => c == 0);
-
-        this.setState({ markLoading: true });
-
-        return this.TicTacToe.methods.markPosition(this.props.match.params.id, cell)
-            .send({ from: this.props.accounts[0] })
-            .then(tx => {
-                this.setState({ markLoading: false });
-
-                if (!tx.events.PositionMarked || !tx.events.PositionMarked.returnValues) {
-                    throw new Error("The transaction failed");
-                }
-
-                message.success("The position has been marked");
-
-                return this.getGameStatus().then(game => {
-                    this.setState({ game, loadingGameInfo: false });
-                })
-            })
-            .catch(err => {
-                console.log('err', err);
-                this.setState({ markLoading: false })
-
-                let msg = err.message.replace(/\.$/, "").replace(/Returned error: Error: MetaMask Tx Signature: /, "")
-                notification.error({
-                    message: 'Unable to mark the cell',
-                    description: msg
-                });
-            });
-    }
-
-    markPosition(cell) {
-        if ((this.state.game.status == "1" && this.state.game.player1 != this.props.accounts[0]) ||
-            (this.state.game.status == "2" && this.state.game.player2 != this.props.accounts[0])) {
-            return;
-        }
-        else if (["0", "10", "11", "12"].includes(this.state.game.status)) {
-            return;
-        }
-        if (this.state.game.cells[cell] != 0) {
-            return message.error("The cell is already taken");
-        }
-
-        this.setState({ markLoading: true });
-
-        return this.TicTacToe.methods.markPosition(this.props.match.params.id, cell)
-            .send({ from: this.props.accounts[0] })
-            .then(tx => {
-                this.setState({ markLoading: false })
-
-                if (!tx.events.PositionMarked || !tx.events.PositionMarked.returnValues) {
-                    throw new Error("The transaction failed")
-                }
-
-                message.success("The position has been marked")
-
-                return this.getGameStatus().then(game => {
-                    this.setState({ game, loadingGameInfo: false })
-
-                    // only makes sense if you play against yourself
-                    if (game.player1 == game.player2) {
-                        return this.checkLastPositionLeft(game)
-                    }
-                })
-            })
-            .catch(err => {
-                this.setState({ markLoading: false });
-
-                let msg = err.message.replace(/\.$/, "").replace(/Returned error: Error: MetaMask Tx Signature: /, "");
-                notification.error({
-                    message: 'Unable to mark the cell',
-                    description: msg
-                });
-            });
-    }
-
-    requestWithdrawal() {
-
-        this.setState({ withdrawLoading: true });
-
-        return this.TicTacToe.methods.withdraw(this.props.match.params.id)
-            .send({ from: this.props.accounts[0] })
-            .then(tx => {
-                this.setState({ withdrawLoading: false })
-
-                notification.success({
-                    message: "Success",
-                    description: "The money has been withdrawn"
-                });
-
-                this.setState({ loadingGameInfo: true });
-
-                return this.getGameStatus().then(game => {
-                    this.setState({ game, loadingGameInfo: false });
-                })
-            })
-            .catch(err => {
-                this.setState({ withdrawLoading: false, loadingGameInfo: false })
-
-                let msg = err.message.replace(/\.$/, "").replace(/Returned error: Error: MetaMask Tx Signature: /, "")
-                notification.error({
-                    message: 'Unable to complete the transaction',
-                    description: msg
-                });
-            });
-    }
-
     goBack() {
         // TODO: Probably a better way to do this
         document.location.hash = "#/";
     }
 
-    // Render helpers
+    // Get current game status from props / state
+    // Do we need to accept / confirm the game, play a turn, or withdraw a reward?
     getStatus() {
         if (!this.state.game || !this.props.accounts) {
             return "";
@@ -461,6 +318,7 @@ class GameView extends Component {
         }
     }
 
+    // Determine if game has expired
     getTimeStatus() {
         let action = "", 
             subject = "", 
@@ -564,19 +422,6 @@ class GameView extends Component {
         return false;
     }
 
-    /**
-     * Determine if a target cell is available to be played on
-     * @param {Number} index: Index of the cell, in the board array, to be analyzed
-     */
-    getCellClass(index) {
-        if (!this.state.game || !this.state.game.cells) return "cell"
-        switch (this.state.game.cells[index]) {
-            case "1": return "cell cell-x"
-            case "2": return "cell cell-o"
-            default: return "cell"
-        }
-    }
-
     // RENDER
     render() {
         let web3 = getWebSocketWeb3();
@@ -595,37 +440,7 @@ class GameView extends Component {
 
                         <Divider />
 
-                        <table id="board">
-                            <tbody>
-                                <tr>
-                                    <td><div id="cell-0" onClick={() => this.markPosition(0)} className={this.getCellClass(0)} /></td>
-                                    <td className="line" />
-                                    <td><div id="cell-1" onClick={() => this.markPosition(1)} className={this.getCellClass(1)} /></td>
-                                    <td className="line" />
-                                    <td><div id="cell-2" onClick={() => this.markPosition(2)} className={this.getCellClass(2)} /></td>
-                                </tr>
-                                <tr className="line">
-                                    <td colSpan={5} className="line" />
-                                </tr>
-                                <tr>
-                                    <td><div id="cell-3" onClick={() => this.markPosition(3)} className={this.getCellClass(3)} /></td>
-                                    <td className="line" />
-                                    <td><div id="cell-4" onClick={() => this.markPosition(4)} className={this.getCellClass(4)} /></td>
-                                    <td className="line" />
-                                    <td><div id="cell-5" onClick={() => this.markPosition(5)} className={this.getCellClass(5)} /></td>
-                                </tr>
-                                <tr className="line">
-                                    <td colSpan={5} className="line" />
-                                </tr>
-                                <tr>
-                                    <td><div id="cell-6" onClick={() => this.markPosition(6)} className={this.getCellClass(6)} /></td>
-                                    <td className="line" />
-                                    <td><div id="cell-7" onClick={() => this.markPosition(7)} className={this.getCellClass(7)} /></td>
-                                    <td className="line" />
-                                    <td><div id="cell-8" onClick={() => this.markPosition(8)} className={this.getCellClass(8)} /></td>
-                                </tr>
-                            </tbody>
-                        </table>
+                        {/* GAME BOARD HTML WILL GO HERE */}
 
                     </div>
                 </Col>
@@ -643,16 +458,6 @@ class GameView extends Component {
                                     <p id="timer" className="light">{this.getTimeStatus()}</p>
                                     {
                                         this.state.game ? <p id="bet" className="light">Game bet: {web3.utils.fromWei(this.state.game.amount)}</p> : null
-                                    }
-
-                                    {
-                                        (this.canWithdraw() && this.state.game && this.state.game.amount != 0) ? [
-                                            <Divider key="0" />,
-                                            <Button id="withdraw" key="1" type="primary" className="width-100"
-                                                onClick={() => this.requestWithdrawal()}>Withdraw {web3.utils.fromWei(this.state.game.amount)}</Button>,
-                                            <br key="3" />,
-                                            <br key="4" />
-                                        ] : null
                                     }
                                     <Button id="back" type="primary" className="width-100" onClick={() => this.goBack()}>Go back</Button>
                                 </div>
