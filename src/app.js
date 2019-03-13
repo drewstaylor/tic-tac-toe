@@ -7,12 +7,12 @@ import { connect } from 'react-redux';
 // Contracts
 import { isWeb3Injected, getInjectedWeb3 } from './contracts/web3';
 import getTicTacToeInstance from './contracts/tictactoe';
-import { getOpenGames } from './store/actions';
+import { getOpenGames } from './store/actions'; // Handles calls to contract to list of 'active' games
 
 // Views
-import MainView from './views/main';
-import GameView from './views/game';
-import LoadingView from './views/loading';
+import MainView from './views/main'; // Our dashboard that lists open games and creates them
+import GameView from './views/game'; // Our browser view when playing a game, TODO: build html of game board
+import LoadingView from './views/loading'; 
 import MessageView from './views/message';
 import Container from './views/partials/container'
 
