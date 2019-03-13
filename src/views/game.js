@@ -333,8 +333,8 @@ class GameView extends Component {
                 notification.error({
                     message: 'Unable to mark the cell',
                     description: msg
-                })
-            })
+                });
+            });
     }
 
     markPosition(cell) {
